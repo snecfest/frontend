@@ -14,7 +14,7 @@ const Navbar = () => {
       <div className="text-white font-bold text-xl" 
         onClick={handleHomeDirect} 
       >
-        Team
+        SnecFest
       </div>
       
       <div>
