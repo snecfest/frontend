@@ -8,20 +8,22 @@ const Table = ({ data, onView, onDelete, onDownload }) => {
         <table className="w-full border-collapse border border-gray-200">
           <thead className="bg-gray-100">
             <tr>
-              <th className="border border-gray-300 px-4 py-2">College ID</th>
-              <th className="border border-gray-300 px-4 py-2">Student ID</th>
-              <th className="border border-gray-300 px-4 py-2">Program ID</th>
+              <th className="border border-gray-300 px-4 py-2">Program Code</th>
               <th className="border border-gray-300 px-4 py-2">Program Name</th>
+              <th className="border border-gray-300 px-4 py-2">Program Category</th>
+              <th className="border border-gray-300 px-4 py-2">Students</th>
               <th className="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2 text-center">{item.collegeId}</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">{item.studentId}</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">{item.programId}</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">{item.programName}</td>
+                <td className="border border-gray-300 px-4 py-2 text-center">{item.uniqueCode}</td>
+                <td className="border border-gray-300 px-4 py-2 text-center">{item.name}</td>
+                <td className="border border-gray-300 px-4 py-2 text-center">{item.categoryName}</td>
+                <td className="border border-gray-300 px-4 py-2 text-center">
+                  {item.students.map((student) => student.name).join(', ')}
+                </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   <button
                     onClick={() => onView(item)}

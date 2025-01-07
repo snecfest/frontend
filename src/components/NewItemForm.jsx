@@ -1,8 +1,9 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { ProgramAdd } from '../services/ProgramService';
+import toast from 'react-hot-toast';
 
-const NewItemForm = () => {
+const NewItemForm = ({onClose}) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async(data) => {
@@ -10,6 +11,13 @@ const NewItemForm = () => {
     try {
         const response=await ProgramAdd(data)
         console.log('response in the component',response)
+        if(response.status===200){
+          toast.success(response.data.message)
+          onClose()
+        }
+        else{
+          toast.error(response.status)
+        }
     } catch (error) {
         console.log('error in the program add component',error)
     }

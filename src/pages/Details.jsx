@@ -1,37 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import NewItemForm from "../components/NewItemForm";
 import Table from "../components/Table";
 import Canvas from "../components/Canvas";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { ProgramGet } from "../services/ProgramService";
 
 const Details = () => {
   const [viewCard, setViewCard] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-
-  const mockData = [
-    {
-      collegeId: "COL001",
-      studentId: "STU001",
-      programId: "PROG001",
-      programName: "Computer Science",
-    },
-    {
-      collegeId: "COL002",
-      studentId: "STU002",
-      programId: "PROG002",
-      programName: "Mechanical Engineering",
-    },
-    {
-      collegeId: "COL003",
-      studentId: "STU003",
-      programId: "PROG003",
-      programName: "Electrical Engineering",
-    },
-  ];
-
+  const [programData,setProgramData]=useState([])
+  
+  useEffect(()=>{
+    const programsFetching=async()=>{
+      try {
+        const response=await ProgramGet()
+        console.log('fetched programs in the component',response)
+        setProgramData(response.programs)
+      } catch (error) {
+        console.log('error in the progaram fetch function in the component',error)
+      }
+    }
+    programsFetching()
+  },[])
   const handleAddNew = () => {
     setOpenModal(true);
   };
@@ -94,14 +87,14 @@ const Details = () => {
       </div>
       <div>
         <Table
-          data={mockData}
+          data={programData}
           onView={handleView}
           onDelete={(item) => console.log("Deleting item:", item)}
           onDownload={handleDownload}
         />
       </div>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <NewItemForm />
+        <NewItemForm onClose={handleCloseModal}/>
       </Modal>
       <Modal isOpen={viewCard} onClose={handleCloseModal}>
         <div
