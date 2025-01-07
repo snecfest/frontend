@@ -1,22 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { LoginService } from "../services/LoginService";
+import { toast, Toaster } from "react-hot-toast";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  // Initialize React Hook Form
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async(token) => {
+  useEffect(() => {
+    const token = Cookies.get("authToken");
+    if (token) {
+      navigate("/details");
+    }
+  }, [navigate]);
+
+  const onSubmit = async (token) => {
     console.log("Submitted Data:", token);
     try {
-        const response=await LoginService(token)
-        console.log('response in the login component',response)
+      const response = await LoginService(token);
+      // console.log('response in the login component',response)
+      if (response.status === 200) {
+        Cookies.set("authToken", response.data.token, { expires: 0.5 });
+        toast.success("Login Successful!");
+        navigate("/details");
+      } else {
+        toast.error(response.message || "Login failed. Please try again.");
+      }
     } catch (error) {
-        console.log('error in the component',error)
+      console.log("error in the component", error);
     }
   };
 
@@ -26,13 +43,16 @@ const Login = () => {
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="id">
+            <label
+              className="block text-gray-700 font-medium mb-2"
+              htmlFor="id"
+            >
               Enter Your Token Id
             </label>
             <input
-              id="id"
+              id="token"
               type="text"
-              {...register("id", {
+              {...register("token", {
                 required: "ID is required",
                 minLength: {
                   value: 5,
@@ -40,12 +60,16 @@ const Login = () => {
                 },
               })}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.id ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300"
+                errors.token
+                  ? "border-red-500 focus:ring-red-300"
+                  : "border-gray-300 focus:ring-blue-300"
               }`}
               placeholder="Enter your ID"
             />
-            {errors.id && (
-              <p className="text-red-500 text-sm mt-1">{errors.id.message}</p>
+            {errors.token && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.token.message}
+              </p>
             )}
           </div>
 

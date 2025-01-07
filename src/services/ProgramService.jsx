@@ -9,3 +9,13 @@ export const ProgramAdd=async(data)=>{
         console.log('error in the program addition service',error)
     }
 }
+
+
+export const ProgramGet=async()=>{
+    try {
+        const response=await axiosInstance.get('/programs')
+        console.log(response)
+    } catch (error) {
+        console.log('error in the program get service section',error)
+    }
+}
