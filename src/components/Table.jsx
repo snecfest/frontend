@@ -11,10 +11,7 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
       [uniqueCode]: value,
     }));
   
-    if (value.length < 5) {
-      toast.error("Student ID must be at least 5 characters long");
-      return;
-    }
+    
   
     if (value.length > 5) {
       toast.error("Student ID cannot exceed 5 characters");
@@ -70,8 +67,9 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
                 </td>
                 <td className="border border-gray-300 ">
                   {item.students.length > 0 ? (
-                    item.students.map((student) => (
+                    item.students.map((student,index) => (
                       <>
+                      
                       <input
                         key={student.studentId}
                         type="text"
