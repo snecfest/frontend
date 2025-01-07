@@ -21,3 +21,13 @@ export const ProgramGet=async()=>{
         console.log('error in the program get service section',error)
     }
 }
+
+export const DeleteProgram=async(programCode)=>{
+    console.log(' program id in service',programCode)
+    try {
+        const response=await axiosInstance.delete(`/programs/${programCode}`)
+        console.log('delete response in service', response)
+    } catch (error) {
+        console.log('delete error in service',error)
+    }
+}

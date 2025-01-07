@@ -25,6 +25,7 @@ const Details = () => {
     }
     programsFetching()
   },[])
+
   const handleAddNew = () => {
     setOpenModal(true);
   };
@@ -34,45 +35,7 @@ const Details = () => {
     setViewCard(false);
   };
 
-  const handleView = (item) => {
-    setViewCard(true);
-    setSelectedStudent(item);
-  };
-
-  const handleDownload = async (item) => {
-    setSelectedStudent(item);
-    setViewCard(true); // Open the modal
   
-    // Wait for modal rendering before capturing the canvas
-    setTimeout(async () => {
-      const canvasElement = document.getElementById("canvas-to-download");
-      if (!canvasElement) {
-        console.error("Canvas element not found");
-        return;
-      }
-  
-      try {
-        // Capture the canvas content
-        const canvas = await html2canvas(canvasElement, {
-          useCORS: true,
-          scale: 2,
-        });
-  
-        // Generate the image and PDF
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF();
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-  
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`${item.studentId}_details.pdf`);
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-      }
-  
-      setViewCard(false); // Close modal after download
-    }, 500); // Adjust delay as needed for rendering
-  };
   
 
   return (
@@ -88,9 +51,9 @@ const Details = () => {
       <div>
         <Table
           data={programData}
-          onView={handleView}
-          onDelete={(item) => console.log("Deleting item:", item)}
-          onDownload={handleDownload}
+          // onView={handleView}
+          // onDelete={handleDelete}
+          // onDownload={handleDownload}
         />
       </div>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
