@@ -6,17 +6,13 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
   const [studentIds, setStudentIds] = useState({});
 
   const handleInputChange = async (uniqueCode, value) => {
+    // Restrict input length to 5 characters
+    if (value.length > 5) return;
+  
     setStudentIds((prev) => ({
       ...prev,
       [uniqueCode]: value,
     }));
-  
-    
-  
-    if (value.length > 5) {
-      toast.error("Student ID cannot exceed 5 characters");
-      return;
-    }
   
     if (value.length === 5) {
       try {
@@ -29,13 +25,14 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
       } catch (error) {
         console.log("error in the program addition", error);
         if (error.response && error.response.data && error.response.data.message) {
-          toast.error(error.response.data.message); 
+          toast.error(error.response.data.message);
         } else {
-          toast.error("An unexpected error occurred. Please try again."); 
+          toast.error("Student Not Found In Your College");
         }
       }
     }
   };
+  
   
 
   return (
@@ -91,6 +88,7 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
                       onChange={(e) =>
                         handleInputChange(item.uniqueCode, e.target.value)
                       }
+                      maxLength={5}
                       className="w-2/4 text-center border border-gray-300 rounded-md px-2 py-1"
                     />
                     </div>
@@ -103,22 +101,10 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   <button
-                    onClick={() => onView(item)}
-                    className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 mr-2"
-                  >
-                    View
-                  </button>
-                  <button
                     onClick={() => onDelete(item)}
                     className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 mr-2"
                   >
                     Delete
-                  </button>
-                  <button
-                    onClick={() => onDownload(item)}
-                    className="bg-green-600 text-white px-2 py-1 rounded-md hover:bg-green-700"
-                  >
-                    Download
                   </button>
                 </td>
               </tr>

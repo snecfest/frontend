@@ -5,15 +5,17 @@ import Table from "../components/Table";
 import Canvas from "../components/Canvas";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { ProgramGet,DeleteProgram } from "../services/ProgramService";
+import { ProgramGet,DeleteProgram, FetchProgramByStudentId } from "../services/ProgramService";
 import toast from "react-hot-toast";
+import Search from "../components/Search";
 
 const Details = () => {
   const [viewCard, setViewCard] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [programData,setProgramData]=useState([])
-  
+  const [viewModal,setViewModal]=useState(false)
+  const [fetchedStudentData,setFetchedStudentData]=useState([])
+
   const programsFetching=async()=>{
     try {
       const response=await ProgramGet()
@@ -27,22 +29,32 @@ const Details = () => {
     programsFetching()
   },[])
 
-  const handleAddNew = () => {
-    setOpenModal(true);
-  };
+  
 
   const handleCloseModal = () => {
-    setOpenModal(false);
     setViewCard(false);
+    setViewModal(false)
   };
 
+  // search option function
 
-
-
-  const handleView = (item) => {
-    setViewCard(true);
-    setSelectedStudent(item);
-  };
+  const handleView=async(value)=>{
+    try {
+      const studentIds = value.split(',').map((id) => id.trim());
+    if (studentIds.length === 0) {
+      console.log('No student IDs provided');
+      return;
+    }
+    const response = await FetchProgramByStudentId(studentIds);
+    console.log('Fetched programs:', response);
+    if(response.status===200){
+      setFetchedStudentData(response.data.students)
+      setViewModal(true)
+    }
+    } catch (error) {
+      console.log('error for the fetching program by studentIds in component',error)
+    }
+  }
 
   const handleDelete=async(item)=>{
     console.log('clicking the delete button',item)
@@ -95,13 +107,8 @@ const Details = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-end">
-        <button
-          className="bg-green-600 text-white hover:bg-green-900 w-28 rounded-lg h-8"
-          onClick={handleAddNew}
-        >
-          Add New +
-        </button>
+      <div className="w-full mb-4">
+        <Search   onView={handleView}/>
       </div>
       <div>
         <Table
@@ -112,17 +119,20 @@ const Details = () => {
           refetchPrograms={programsFetching}
         />
       </div>
-      <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <NewItemForm onClose={handleCloseModal}/>
+      <Modal isOpen={viewModal} onClose={handleCloseModal}>
+        <div className="space-y-4">
+          {fetchedStudentData.map((student, index) => (
+            <Canvas key={index} student={student} />
+          ))}
+        </div>
       </Modal>
-      <Modal isOpen={viewCard} onClose={handleCloseModal}>
+      {/* <Modal isOpen={viewCard} onClose={handleCloseModal}>
         <div
           id="canvas-to-download"
-          // style={{ padding: "20px", backgroundColor: "white" }} // Add default styling
         >
           <Canvas student={selectedStudent} />
         </div>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

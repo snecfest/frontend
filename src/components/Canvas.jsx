@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Canvas = ({ student }) => {
   return (
@@ -9,20 +9,22 @@ const Canvas = ({ student }) => {
       <div className="bg-white rounded-lg p-4 shadow-md">
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-gray-600">📋 College ID:</span>
-            <span className="text-gray-800">{student.collegeId}</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-gray-600">🆔 Student ID:</span>
+            <span className="font-semibold text-gray-600">📋 Student ID:</span>
             <span className="text-gray-800">{student.studentId}</span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-gray-600">🔑 Program ID:</span>
-            <span className="text-gray-800">{student.programId}</span>
+            <span className="font-semibold text-gray-600">🧑 Name:</span>
+            <span className="text-gray-800">{student.name}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-gray-600">📚 Program Name:</span>
-            <span className="text-gray-800">{student.programName}</span>
+          <div>
+            <span className="font-semibold text-gray-600">📚 Programs:</span>
+            <ul className="list-disc pl-5">
+              {student.programs.map((program, idx) => (
+                <li key={idx} className="text-gray-800">
+                  {program.name} ({program.categoryName}) - {program.collegeName}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
