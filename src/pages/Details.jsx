@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import NewItemForm from "../components/NewItemForm";
+import Table from "../components/Table";
 import Canvas from "../components/Canvas";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -48,7 +49,7 @@ const Details = () => {
         setViewModal(true);
       }
     } catch (error) {
-      console.log("Error fetching program by student IDs in component", error);
+      console.log("Error for the fetching program by studentIds in component", error);
     }
   };
 
@@ -60,7 +61,6 @@ const Details = () => {
         toast.success(response.data.message);
         programsFetching();
       }
-      return;
     } catch (error) {
       console.log("Delete error in component", error);
       toast.error(error.response.data.message);
@@ -69,7 +69,7 @@ const Details = () => {
 
   const handleDownload = async (item) => {
     setSelectedStudent(item);
-    setViewCard(true); // Open the modal
+    setViewCard(true);
 
     setTimeout(async () => {
       const canvasElement = document.getElementById("canvas-to-download");
@@ -79,7 +79,6 @@ const Details = () => {
       }
 
       try {
-        // Capture the canvas content
         const canvas = await html2canvas(canvasElement, {
           useCORS: true,
           scale: 2,
@@ -96,11 +95,11 @@ const Details = () => {
         console.error("Error generating PDF:", error);
       }
 
-      setViewCard(false); // Close modal after download
-    }, 500); // Adjust delay as needed for rendering
+      setViewCard(false);
+    }, 500);
   };
 
-  // Group programs by category and sort
+  // Group programs by category
   const groupedPrograms = programData.reduce((acc, program) => {
     const category = program.categoryName;
     if (!acc[category]) {
@@ -109,10 +108,6 @@ const Details = () => {
     acc[category].push(program);
     return acc;
   }, {});
-
-  Object.keys(groupedPrograms).forEach((category) => {
-    groupedPrograms[category].sort((a, b) => a.uniqueCode.localeCompare(b.uniqueCode));
-  });
 
   return (
     <div className="p-6">
@@ -123,47 +118,13 @@ const Details = () => {
         {Object.keys(groupedPrograms).map((category) => (
           <div key={category} className="mb-8">
             <h2 className="text-xl font-bold mb-4">{category}</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-200">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="border border-gray-300 px-4 py-2">Program Code</th>
-                    <th className="border border-gray-300 px-4 py-2">Program Name</th>
-                    <th className="border border-gray-300 px-4 py-2">Eligible Colleges</th>
-                    <th className="border border-gray-300 px-4 py-2">Student Name</th>
-                    <th className="border border-gray-300 px-4 py-2">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {groupedPrograms[category].map((program) => (
-                    <tr key={program._id} className="hover:bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        {program.uniqueCode}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        {program.name}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        {program.eligibleColleges.join(", ")}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        {program.students.length > 0
-                          ? program.students.map((student) => student.name).join(", ")
-                          : "No students"}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        <button
-                          onClick={() => handleDelete(program)}
-                          className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              data={groupedPrograms[category]}
+              onView={handleView}
+              onDelete={handleDelete}
+              onDownload={handleDownload}
+              refetchPrograms={programsFetching}
+            />
           </div>
         ))}
       </div>
@@ -172,11 +133,6 @@ const Details = () => {
           {fetchedStudentData.map((student, index) => (
             <Canvas key={index} student={student} />
           ))}
-        </div>
-      </Modal>
-      <Modal isOpen={viewCard} onClose={handleCloseModal}>
-        <div id="canvas-to-download">
-          <Canvas student={selectedStudent} />
         </div>
       </Modal>
     </div>
