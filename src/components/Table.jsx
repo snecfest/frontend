@@ -2,38 +2,45 @@ import React, { useState } from "react";
 import { ProgramAdd } from "../services/ProgramService";
 import toast from "react-hot-toast";
 
-const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
+const Table = ({ data, onDelete, refetchPrograms }) => {
   const [studentIds, setStudentIds] = useState({});
 
-  const handleInputChange = async (uniqueCode, value) => {
-    // Restrict input length to 5 characters
-    if (value.length > 5) return;
-  
+  const handleInputChange = (uniqueCode, value) => {
     setStudentIds((prev) => ({
       ...prev,
       [uniqueCode]: value,
     }));
-  
-    if (value.length === 5) {
-      try {
-        const response = await ProgramAdd({ programCode: uniqueCode, studentId: value });
-        console.log("response in the program add", response);
-        if (response.status === 200) {
-          toast.success(response.data.message);
-          refetchPrograms(); // Call to refetch program data
-        }
-      } catch (error) {
-        console.log("error in the program addition", error);
-        if (error.response && error.response.data && error.response.data.message) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.error("Student Not Found In Your College");
-        }
+  };
+
+  const handleAddStudent = async (uniqueCode) => {
+    const studentId = studentIds[uniqueCode];
+    if (!studentId) {
+      toast.error("Please enter a student ID.");
+      return;
+    }
+
+    try {
+      const response = await ProgramAdd({ programCode: uniqueCode, studentId });
+      console.log("Response in the program add", response);
+      if (response.status === 200) {
+        toast.success(response.data.message);
+        refetchPrograms(); // Call to refetch program data
+      }
+    } catch (error) {
+      console.log("Error in the program addition", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Student Not Found In Your College");
       }
     }
   };
-  
-  
+
+  const handleKeyPress = (e, uniqueCode) => {
+    if (e.key === "Enter") {
+      handleAddStudent(uniqueCode);
+    }
+  };
 
   return (
     <div className="p-4">
@@ -62,11 +69,9 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {item.categoryName}
                 </td>
-                <td className="border border-gray-300 ">
+                <td className="border border-gray-300 px-4 py-2">
                   {item.students.length > 0 ? (
-                    item.students.map((student,index) => (
-                      <>
-                      
+                    item.students.map((student) => (
                       <input
                         key={student.studentId}
                         type="text"
@@ -74,26 +79,24 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
                         disabled
                         className="w-2/4 text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1"
                       />
-                      </>
-                      
                     ))
                   ) : (
-                    <>
-                    <div className="flex">
-
-                    <input
-                      type="text"
-                      placeholder="Enter Student ID"
-                      value={studentIds[item.uniqueCode] || ""}
-                      onChange={(e) =>
-                        handleInputChange(item.uniqueCode, e.target.value)
-                      }
-                      maxLength={5}
-                      className="w-2/4 text-center border border-gray-300 rounded-md px-2 py-1"
-                    />
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        placeholder="Enter Student ID"
+                        value={studentIds[item.uniqueCode] || ""}
+                        onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
+                        onKeyPress={(e) => handleKeyPress(e, item.uniqueCode)}
+                        className="w-2/4 text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
+                      />
+                      <button
+                        onClick={() => handleAddStudent(item.uniqueCode)}
+                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                      >
+                        Add
+                      </button>
                     </div>
-
-                    </>
                   )}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
@@ -102,7 +105,7 @@ const Table = ({ data, onView, onDelete, onDownload,refetchPrograms }) => {
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   <button
                     onClick={() => onDelete(item)}
-                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700 mr-2"
+                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
                   >
                     Delete
                   </button>
