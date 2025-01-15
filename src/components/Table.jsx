@@ -34,6 +34,12 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
 
         // Clear input for General category
         setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
+      } else {
+        if (response.data.error) {
+          toast.error(response.data.error);
+        } else {
+          toast.error("Student Not Found In Your College");
+        }
       }
     } catch (error) {
       console.log("Error in the program addition", error);
