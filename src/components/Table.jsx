@@ -62,7 +62,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
             toast.error("An error occurred. Please try again.");
         }
       } else {
-        toast.error("An unexpected error occurred. Please try again.");
+        toast.error(errorMessage||"An unexpected error occurred. Please try again.");
       }
     } catch (error) {
       console.log("Error in the program addition:", error);
