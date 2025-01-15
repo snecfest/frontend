@@ -79,13 +79,13 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                     <input
                       type="text"
                       placeholder="Enter Student ID"
-                      value={studentIds[item.uniqueCode] || ""}
-                      onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
-                      onKeyPress={(e) => handleKeyPress(e, item.uniqueCode, item.categoryName)}
+                      value={studentIds[item.studentId] || ""}
+                      onChange={(e) => handleInputChange(item.studentId, e.target.value)}
+                      onKeyPress={(e) => handleKeyPress(e, item.studentId, item.categoryName)}
                       className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
                     />
                     <button
-                      onClick={() => handleAddStudent(item.uniqueCode, item.categoryName)}
+                      onClick={() => handleAddStudent(item.studentId, item.categoryName)}
                       className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
                     >
                       Add
