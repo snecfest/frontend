@@ -33,8 +33,8 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       }
     } catch (error) {
       console.log("Error in the program addition", error);
-      if (error.response && error.response.data && error.response.data.message) {
-        toast.error(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.error) {
+        toast.error(error.response.data.error);
       } else {
         toast.error("Student Not Found In Your College");
       }
