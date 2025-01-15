@@ -101,96 +101,97 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">Program Details</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border border-gray-300 px-4 py-2">Program Code</th>
-              <th className="border border-gray-300 px-4 py-2">Program Name</th>
-              <th className="border border-gray-300 px-4 py-2">Program Category</th>
-              <th className="border border-gray-300 px-4 py-2">Student ID</th>
-              <th className="border border-gray-300 px-4 py-2">Student Name</th>
-              <th className="border border-gray-300 px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {item.uniqueCode}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {item.name}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {item.categoryName}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">
-                  <div className="space-y-2">
-                    {/* Existing student IDs */}
-                    {item.students.map((student, idx) => (
+    <h2 className="text-lg font-semibold mb-4">Program Details</h2>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse border border-gray-200">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="border border-gray-300 px-4 py-2">Program Code</th>
+            <th className="border border-gray-300 px-4 py-2">Program Name</th>
+            <th className="border border-gray-300 px-4 py-2">Program Category</th>
+            <th className="border border-gray-300 px-4 py-2">Student ID</th>
+            <th className="border border-gray-300 px-4 py-2">Student Name</th>
+            <th className="border border-gray-300 px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item, index) => (
+            <tr key={index} className="hover:bg-gray-50">
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {item.uniqueCode}
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {item.name}
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {item.categoryName}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">
+                <div className="space-y-2">
+                  {/* Existing student IDs */}
+                  {item.students.map((student, idx) => (
+                    <input
+                      key={`${student.studentId}-${idx}`}
+                      type="text"
+                      value={student.studentId}
+                      disabled
+                      className="w-full text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1"
+                    />
+                  ))}
+                  {/* Input for new student ID */}
+                  {item.categoryName === "General" || item.students.length === 0 ? (
+                    <div className="flex flex-wrap items-center">
                       <input
-                        key={`${student.studentId}-${idx}`}
                         type="text"
-                        value={student.studentId}
-                        disabled
-                        className="w-full text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1"
+                        placeholder="Enter Student ID"
+                        value={studentIds[item.uniqueCode] || ""}
+                        onChange={(e) =>
+                          handleInputChange(item.uniqueCode, e.target.value)
+                        }
+                        onKeyPress={(e) =>
+                          handleKeyPress(
+                            e,
+                            item.uniqueCode,
+                            item.categoryName,
+                            item.students.map((student) => student.studentId)
+                          )
+                        }
+                        className="flex-1 min-w-[100px] sm:w-auto md:w-1/2 lg:w-1/3 xl:w-1/4 text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
                       />
-                    ))}
-                    {/* Input for new student ID */}
-                    {item.categoryName === "General" || item.students.length === 0 ? (
-                      <div className="flex items-center">
-                        <input
-                          type="text"
-                          placeholder="Enter Student ID"
-                          value={studentIds[item.uniqueCode] || ""}
-                          onChange={(e) =>
-                            handleInputChange(item.uniqueCode, e.target.value)
-                          }
-                          onKeyPress={(e) =>
-                            handleKeyPress(
-                              e,
-                              item.uniqueCode,
-                              item.categoryName,
-                              item.students.map((student) => student.studentId)
-                            )
-                          }
-                          className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
-                        />
-                        <button
-                          onClick={() =>
-                            handleAddStudent(
-                              item.uniqueCode,
-                              item.categoryName,
-                              item.students.map((student) => student.studentId)
-                            )
-                          }
-                          className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
-                        >
-                          Add
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {item.students.map((student) => student.name).join(", ")}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <button
-                    onClick={() => onDelete(item)}
-                    className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      <button
+                        onClick={() =>
+                          handleAddStudent(
+                            item.uniqueCode,
+                            item.categoryName,
+                            item.students.map((student) => student.studentId)
+                          )
+                        }
+                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                {item.students.map((student) => student.name).join(", ")}
+              </td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
+                <button
+                  onClick={() => onDelete(item)}
+                  className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
+  </div>
+  
   );
 };
 
