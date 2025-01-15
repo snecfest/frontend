@@ -24,12 +24,13 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       console.log("Response in the program add", response);
       if (response.status === 200) {
         toast.success(response.data.message);
-        refetchPrograms(); // Call to refetch program data
+        refetchPrograms(); // Refetch program data
 
-        // Clear the input for General category
-        if (categoryName === "General") {
-          setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
-        }
+        // Clear the input for General category or disable for others
+        setStudentIds((prev) => ({
+          ...prev,
+          [uniqueCode]: categoryName === "General" ? "" : studentId,
+        }));
       }
     } catch (error) {
       console.log("Error in the program addition", error);
@@ -57,8 +58,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
               <th className="border border-gray-300 px-4 py-2">Program Code</th>
               <th className="border border-gray-300 px-4 py-2">Program Name</th>
               <th className="border border-gray-300 px-4 py-2">Program Category</th>
-              <th className="border border-gray-300 px-4 py-2">Student Id</th>
-              <th className="border border-gray-300 px-4 py-2">Student Name</th>
+              <th className="border border-gray-300 px-4 py-2">Student IDs</th>
               <th className="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
           </thead>
@@ -75,39 +75,41 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                   {item.categoryName}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {item.categoryName === "general" ? (
-                    // Enable input for General category
-                    <div className="flex items-center">
+                  <div className="space-y-2">
+                    {/* Show existing student IDs */}
+                    {item.students.map((student, idx) => (
                       <input
-                        type="text"
-                        placeholder="Enter Student ID"
-                        value={studentIds[item.uniqueCode] || ""}
-                        onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
-                        onKeyPress={(e) => handleKeyPress(e, item.uniqueCode, item.categoryName)}
-                        className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
-                      />
-                      <button
-                        onClick={() => handleAddStudent(item.uniqueCode, item.categoryName)}
-                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
-                      >
-                        Add
-                      </button>
-                    </div>
-                  ) : (
-                    // Disable input for other categories, show existing IDs
-                    item.students.map((student) => (
-                      <input
-                        key={student.studentId}
+                        key={`${student.studentId}-${idx}`}
                         type="text"
                         value={student.studentId}
                         disabled
                         className="w-full text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1"
                       />
-                    ))
-                  )}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {item.students.map((student) => student.name).join(", ")}
+                    ))}
+                    {/* Input for new student ID */}
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        placeholder="Enter Student ID"
+                        value={studentIds[item.uniqueCode] || ""}
+                        onChange={(e) =>
+                          handleInputChange(item.uniqueCode, e.target.value)
+                        }
+                        onKeyPress={(e) =>
+                          handleKeyPress(e, item.uniqueCode, item.categoryName)
+                        }
+                        className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
+                      />
+                      <button
+                        onClick={() =>
+                          handleAddStudent(item.uniqueCode, item.categoryName)
+                        }
+                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   <button
