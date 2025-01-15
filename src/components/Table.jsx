@@ -24,17 +24,17 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       console.log("Response in the program add", response);
       if (response.status === 200) {
         toast.success(response.data.message);
-        refetchPrograms(); // Call to refetch program data
+        refetchPrograms(); // Refetch program data
 
-        // Clear the input for General category
+        // Clear the input for "General" category
         if (categoryName === "General") {
           setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
         }
       }
     } catch (error) {
       console.log("Error in the program addition", error);
-      if (error.response && error.response.data && error.response.data.message) {
-        toast.error(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.error) {
+        toast.error(error.response.data.error);
       } else {
         toast.error("Student Not Found In Your College");
       }
@@ -75,22 +75,46 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                   {item.categoryName}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="flex items-center">
-                    <input
-                      type="text"
-                      placeholder="Enter Student ID"
-                      value={studentIds[item.uniqueCode] || ""}
-                      onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
-                      onKeyPress={(e) => handleKeyPress(e, item.uniqueCode, item.categoryName)}
-                      className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
-                    />
-                    <button
-                      onClick={() => handleAddStudent(item.uniqueCode, item.categoryName)}
-                      className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
-                    >
-                      Add
-                    </button>
-                  </div>
+                  {item.categoryName === "general" ? (
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        placeholder="Enter Student ID"
+                        value={studentIds[item.uniqueCode] || ""}
+                        onChange={(e) =>
+                          handleInputChange(item.uniqueCode, e.target.value)
+                        }
+                        onKeyPress={(e) =>
+                          handleKeyPress(e, item.uniqueCode, item.categoryName)
+                        }
+                        className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
+                      />
+                      <button
+                        onClick={() =>
+                          handleAddStudent(item.uniqueCode, item.categoryName)
+                        }
+                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      {item.students.length > 0 ? (
+                        item.students.map((student) => (
+                          <input
+                            key={student.studentId}
+                            type="text"
+                            value={student.studentId}
+                            disabled
+                            className="w-full text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1 mb-2"
+                          />
+                        ))
+                      ) : (
+                        <span className="text-gray-500">No students added</span>
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {item.students.map((student) => student.name).join(", ")}
