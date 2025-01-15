@@ -1,7 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
+  const navigate = useNavigate();
+
   console.log('Landing page component rendered');
+
+  const handleNavigate = () => {
+    navigate('/details');
+  };
 
   return (
     <div className="relative h-screen bg-gray-100">
@@ -22,7 +29,10 @@ const Landing = () => {
         <p className="text-lg md:text-2xl font-medium mb-8">
           OFF STAGE EVENT REGISTRATION
         </p>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md text-lg shadow-lg transition-transform transform hover:scale-105">
+        <button
+          onClick={handleNavigate}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md text-lg shadow-lg transition-transform transform hover:scale-105"
+        >
           Register Now
         </button>
       </div>
