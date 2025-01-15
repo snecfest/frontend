@@ -12,7 +12,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     }));
   };
 
-  const handleAddStudent = async (uniqueCode) => {
+  const handleAddStudent = async (uniqueCode, categoryName) => {
     const studentId = studentIds[uniqueCode];
     if (!studentId) {
       toast.error("Please enter a student ID.");
@@ -25,6 +25,11 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       if (response.status === 200) {
         toast.success(response.data.message);
         refetchPrograms(); // Call to refetch program data
+
+        // Clear the input for General category
+        if (categoryName === "General") {
+          setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
+        }
       }
     } catch (error) {
       console.log("Error in the program addition", error);
@@ -36,9 +41,9 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     }
   };
 
-  const handleKeyPress = (e, uniqueCode) => {
+  const handleKeyPress = (e, uniqueCode, categoryName) => {
     if (e.key === "Enter") {
-      handleAddStudent(uniqueCode);
+      handleAddStudent(uniqueCode, categoryName);
     }
   };
 
@@ -70,34 +75,22 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                   {item.categoryName}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  {item.students.length > 0 ? (
-                    item.students.map((student) => (
-                      <input
-                        key={student.studentId}
-                        type="text"
-                        value={student.studentId}
-                        disabled
-                        className="w-2/4 text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1"
-                      />
-                    ))
-                  ) : (
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        placeholder="Enter Student ID"
-                        value={studentIds[item.uniqueCode] || ""}
-                        onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
-                        onKeyPress={(e) => handleKeyPress(e, item.uniqueCode)}
-                        className="w-2/4 text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
-                      />
-                      <button
-                        onClick={() => handleAddStudent(item.uniqueCode)}
-                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
-                      >
-                        Add
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex items-center">
+                    <input
+                      type="text"
+                      placeholder="Enter Student ID"
+                      value={studentIds[item.uniqueCode] || ""}
+                      onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
+                      onKeyPress={(e) => handleKeyPress(e, item.uniqueCode, item.categoryName)}
+                      className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
+                    />
+                    <button
+                      onClick={() => handleAddStudent(item.uniqueCode, item.categoryName)}
+                      className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                    >
+                      Add
+                    </button>
+                  </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
                   {item.students.map((student) => student.name).join(", ")}
