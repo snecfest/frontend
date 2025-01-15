@@ -20,8 +20,8 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     }
 
     // Prevent duplicates for non-General categories
-    if (categoryName !== "General" && existingStudents.includes(studentId)) {
-      toast.error("This student ID is already assigned.");
+    if (categoryName !== "General" && existingStudents.length > 0) {
+      toast.error("This category only allows one student.");
       return;
     }
 
@@ -32,7 +32,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
         toast.success(response.data.message);
         refetchPrograms(); // Refetch program data
 
-        // Clear the input for General category or disable for others
+        // Clear input for General category
         setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
       }
     } catch (error) {
@@ -91,35 +91,39 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                       />
                     ))}
                     {/* Input for new student ID */}
-                    <div className="flex items-center">
-                      <input
-                        type="text"
-                        placeholder="Enter Student ID"
-                        value={studentIds[item.uniqueCode] || ""}
-                        onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
-                        onKeyPress={(e) =>
-                          handleKeyPress(
-                            e,
-                            item.uniqueCode,
-                            item.categoryName,
-                            item.students.map((student) => student.studentId)
-                          )
-                        }
-                        className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
-                      />
-                      <button
-                        onClick={() =>
-                          handleAddStudent(
-                            item.uniqueCode,
-                            item.categoryName,
-                            item.students.map((student) => student.studentId)
-                          )
-                        }
-                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
-                      >
-                        Add
-                      </button>
-                    </div>
+                    {item.categoryName === "General" || item.students.length === 0 ? (
+                      <div className="flex items-center">
+                        <input
+                          type="text"
+                          placeholder="Enter Student ID"
+                          value={studentIds[item.uniqueCode] || ""}
+                          onChange={(e) =>
+                            handleInputChange(item.uniqueCode, e.target.value)
+                          }
+                          onKeyPress={(e) =>
+                            handleKeyPress(
+                              e,
+                              item.uniqueCode,
+                              item.categoryName,
+                              item.students.map((student) => student.studentId)
+                            )
+                          }
+                          className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
+                        />
+                        <button
+                          onClick={() =>
+                            handleAddStudent(
+                              item.uniqueCode,
+                              item.categoryName,
+                              item.students.map((student) => student.studentId)
+                            )
+                          }
+                          className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
