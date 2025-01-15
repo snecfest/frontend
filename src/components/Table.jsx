@@ -27,28 +27,70 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
 
     try {
       const response = await ProgramAdd({ programCode: uniqueCode, studentId });
-      console.log("Response in the program add", response);
+    
       if (response.status === 200) {
-        toast.success(response.data.message);
+        toast.success("Student successfully assigned to the program.");
         refetchPrograms(); // Refetch program data
-
-        // Clear input for General category
-        setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
-      } else {
-        if (response.data.error) {
-          toast.error(response.data.error);
-        } else {
-          toast.error("Student Not Found In Your College");
+        setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" })); // Clear input for General category
+      } else if (response.status === 400 || response.status === 404) {
+        // Handle known error responses
+        const errorMessage = response.data.error;
+    
+        switch (errorMessage) {
+          case "Student ID and Program Code are required.":
+            toast.error("Please fill in both the Student ID and Program Code.");
+            break;
+    
+          case "Program not found for your college.":
+            toast.error("The specified program does not exist for your college.");
+            break;
+    
+          case "Student not found in your college.":
+            toast.error("The entered Student ID does not match any student in your college.");
+            break;
+    
+          case "Student is already assigned to this program.":
+            toast.error("This student is already assigned to the selected program.");
+            break;
+    
+          case "Category cat1 allows only one student.":
+          case "Category cat2 allows only one student.":
+            toast.error("This category only allows one student per program.");
+            break;
+    
+          default:
+            toast.error("An error occurred. Please try again.");
         }
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
       }
     } catch (error) {
-      console.log("Error in the program addition", error);
-      if (error.response && error.response.data && error.response.data.error) {
-        toast.error(error.response.data.error);
+      console.log("Error in the program addition:", error);
+    
+      if (error.response) {
+        const { status, data } = error.response;
+    
+        switch (status) {
+          case 400:
+            toast.error(data.error || "Invalid request. Please check your input.");
+            break;
+    
+          case 404:
+            toast.error(data.error || "Resource not found. Please check the details provided.");
+            break;
+    
+          case 500:
+            toast.error("Internal server error. Please try again later.");
+            break;
+    
+          default:
+            toast.error("An unexpected error occurred. Please try again.");
+        }
       } else {
-        toast.error("Student Not Found In Your College");
+        toast.error("Unable to connect to the server. Please check your network and try again.");
       }
     }
+    
   };
 
   const handleKeyPress = (e, uniqueCode, categoryName, existingStudents) => {
