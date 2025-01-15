@@ -12,10 +12,16 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     }));
   };
 
-  const handleAddStudent = async (uniqueCode, categoryName) => {
+  const handleAddStudent = async (uniqueCode, categoryName, existingStudents) => {
     const studentId = studentIds[uniqueCode];
     if (!studentId) {
       toast.error("Please enter a student ID.");
+      return;
+    }
+
+    // Prevent duplicates for non-General categories
+    if (categoryName !== "General" && existingStudents.includes(studentId)) {
+      toast.error("This student ID is already assigned.");
       return;
     }
 
@@ -24,12 +30,10 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       console.log("Response in the program add", response);
       if (response.status === 200) {
         toast.success(response.data.message);
-        refetchPrograms(); // Call to refetch program data
+        refetchPrograms(); // Refetch program data
 
-        // Clear the input for General category
-        if (categoryName === "General") {
-          setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
-        }
+        // Clear the input for General category or disable for others
+        setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" }));
       }
     } catch (error) {
       console.log("Error in the program addition", error);
@@ -41,9 +45,9 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     }
   };
 
-  const handleKeyPress = (e, uniqueCode, categoryName) => {
+  const handleKeyPress = (e, uniqueCode, categoryName, existingStudents) => {
     if (e.key === "Enter") {
-      handleAddStudent(uniqueCode, categoryName);
+      handleAddStudent(uniqueCode, categoryName, existingStudents);
     }
   };
 
@@ -57,7 +61,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
               <th className="border border-gray-300 px-4 py-2">Program Code</th>
               <th className="border border-gray-300 px-4 py-2">Program Name</th>
               <th className="border border-gray-300 px-4 py-2">Program Category</th>
-              <th className="border border-gray-300 px-4 py-2">Student Id</th>
+              <th className="border border-gray-300 px-4 py-2">Student ID</th>
               <th className="border border-gray-300 px-4 py-2">Student Name</th>
               <th className="border border-gray-300 px-4 py-2">Actions</th>
             </tr>
@@ -75,21 +79,47 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                   {item.categoryName}
                 </td>
                 <td className="border border-gray-300 px-4 py-2">
-                  <div className="flex items-center">
-                    <input
-                      type="text"
-                      placeholder="Enter Student ID"
-                      value={studentIds[item.studentId] || ""}
-                      onChange={(e) => handleInputChange(item.studentId, e.target.value)}
-                      onKeyPress={(e) => handleKeyPress(e, item.studentId, item.categoryName)}
-                      className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
-                    />
-                    <button
-                      onClick={() => handleAddStudent(item.studentId, item.categoryName)}
-                      className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
-                    >
-                      Add
-                    </button>
+                  <div className="space-y-2">
+                    {/* Existing student IDs */}
+                    {item.students.map((student, idx) => (
+                      <input
+                        key={`${student.studentId}-${idx}`}
+                        type="text"
+                        value={student.studentId}
+                        disabled
+                        className="w-full text-center bg-gray-100 border border-gray-300 rounded-md px-2 py-1"
+                      />
+                    ))}
+                    {/* Input for new student ID */}
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        placeholder="Enter Student ID"
+                        value={studentIds[item.uniqueCode] || ""}
+                        onChange={(e) => handleInputChange(item.uniqueCode, e.target.value)}
+                        onKeyPress={(e) =>
+                          handleKeyPress(
+                            e,
+                            item.uniqueCode,
+                            item.categoryName,
+                            item.students.map((student) => student.studentId)
+                          )
+                        }
+                        className="w-full text-center border border-gray-300 rounded-md px-2 py-1 mr-2"
+                      />
+                      <button
+                        onClick={() =>
+                          handleAddStudent(
+                            item.uniqueCode,
+                            item.categoryName,
+                            item.students.map((student) => student.studentId)
+                          )
+                        }
+                        className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700"
+                      >
+                        Add
+                      </button>
+                    </div>
                   </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
