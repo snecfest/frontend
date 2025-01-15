@@ -28,11 +28,11 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     try {
       const response = await ProgramAdd({ programCode: uniqueCode, studentId });
     
-      if (response.status === 200) {
+      if (response.status === 200 && !response.data.error) {
         toast.success("Student successfully assigned to the program.");
         refetchPrograms(); // Refetch program data
         setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" })); // Clear input for General category
-      } else if (response.status === 400 || response.status === 404) {
+      } else if (response.data.error) {
         // Handle known error responses
         const errorMessage = response.data.error;
     
