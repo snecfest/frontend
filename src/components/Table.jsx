@@ -37,7 +37,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       }
       
       // General fallback message for other cases
-      if (existingStudents.length > 1) {
+      if (existingStudents.length > 1 && uniqueCode != 100 && uniqueCode != 212 && uniqueCode != 317) {
         toast.error("This category only allows the permitted number of students.");
         return;
       }
