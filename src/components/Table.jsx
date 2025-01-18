@@ -21,17 +21,17 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
 
     // Prevent duplicates for non-General categories
     if (categoryName !== "General") {
-      if (uniqueCode === 317 && existingStudents.length > 2) {
+      if (uniqueCode === 317 && existingStudents.length >= 2) {
         toast.error("Program 317 only allows 1 student.");
         return;
       }
       
-      if (uniqueCode === 212 && existingStudents.length > 2) {
+      if (uniqueCode === 212 && existingStudents.length >= 2) {
         toast.error("Program 212 only allows 1 student.");
         return;
       }
       
-      if (uniqueCode === 110 && existingStudents.length > 3) {
+      if (uniqueCode === 110 && existingStudents.length >= 3) {
         toast.error("Program 110 (കൊളാഷ് നിർമാണം) only allows 3 students.");
         return;
       }
