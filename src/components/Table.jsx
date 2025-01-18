@@ -20,29 +20,13 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     }
 
     // Prevent duplicates for non-General categories
-    if (categoryName !== "General") {
-      if (uniqueCode === 317 && existingStudents.length >= 2) {
-        toast.error("Program 317 only allows 2 student.");
-        return;
-      }
-      
-      if (uniqueCode === 212 && existingStudents.length >= 2) {
-        toast.error("Program 212 only allows 2 student.");
-        return;
-      }
-      
-      if (uniqueCode === 110 && existingStudents.length >= 3) {
-        toast.error("Program 110 (കൊളാഷ് നിർമാണം) only allows 3 students.");
-        return;
-      }
-      
-      // General fallback message for other cases
-      if (existingStudents.length > 1 && uniqueCode != 100 && uniqueCode != 212 && uniqueCode != 317) {
-        toast.error("This category only allows the permitted number of students.");
-        return;
-      }
+    if (
+      categoryName !== "General" &&
+      (uniqueCode !== 317 && existingStudents.length > 1 || uniqueCode !== 212 && existingStudents.length > 1 || uniqueCode !== 110 && existingStudents.length > 2)
+    ) {
+      toast.error("This category only allows one student.");
+      return;
     }
-    
     
 
     try {
@@ -158,7 +142,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                     />
                   ))}
                   {/* Input for new student ID */}
-                  {item.categoryName === "General" || item.name === "ബ്രോഷർ മേക്കിങ്" || item.name === "കൊളാഷ് നിർമാണം" || item.students.length === 0 ? (
+                  {item.categoryName === "General" || item.name === "ബ്രോഷർ മേക്കിങ്" || item.students.length === 0 ? (
                     <div className="flex flex-wrap items-center">
                       <input
                         type="text"
