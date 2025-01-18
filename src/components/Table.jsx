@@ -21,7 +21,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
 
     // Prevent duplicates for non-General categories
     if (
-      ((uniqueCode === 317 || uniqueCode === 212) && existingStudents.length >= 1) ||
+      ((uniqueCode === 317 || uniqueCode === 212) && existingStudents.length >= 0) ||
       (categoryName !== "General" && existingStudents.length >= 1)
     ) {
       toast.error("This category only allows the specified number of students.");
