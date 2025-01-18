@@ -33,7 +33,6 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
       const response = await ProgramAdd({ programCode: uniqueCode, studentId });
     
       if (response.status === 200 && !response.data.error) {
-        toast.success("Student successfully assigned to the program.");
         refetchPrograms(); // Refetch program data
         setStudentIds((prev) => ({ ...prev, [uniqueCode]: "" })); // Clear input for General category
       } else if (response.data.error) {
