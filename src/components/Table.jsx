@@ -23,8 +23,8 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     if (
       categoryName !== "General" &&
       (
-        (uniqueCode === 317 && existingStudents.length > 1) || 
-        (uniqueCode === 212 && existingStudents.length > 1) || 
+        (uniqueCode === 317 && existingStudents.length > 2) || 
+        (uniqueCode === 212 && existingStudents.length > 2) || 
         (uniqueCode === 110 && existingStudents.length > 2)
       )
     ) {
