@@ -147,7 +147,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                     />
                   ))}
                   {/* Input for new student ID */}
-                  {item.categoryName === "General" || item.name === "ബ്രോഷർ മേക്കിങ്" || item.name === "കൊളാഷ് നിർമാണം" || (item.students.length === 0 && item.students.length !==3 ) ? (
+                  {item.categoryName === "General" || item.name === "ബ്രോഷർ മേക്കിങ്" || item.name === "കൊളാഷ് നിർമാണം" || (item.students.length === 0 || item.students.length !==3 ) ? (
                     <div className="flex flex-wrap items-center">
                       <input
                         type="text"
