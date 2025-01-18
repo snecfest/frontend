@@ -22,12 +22,12 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
     // Prevent duplicates for non-General categories
     if (categoryName !== "General") {
       if (uniqueCode === 317 && existingStudents.length >= 2) {
-        toast.error("Program 317 only allows 1 student.");
+        toast.error("Program 317 only allows 2 student.");
         return;
       }
       
       if (uniqueCode === 212 && existingStudents.length >= 2) {
-        toast.error("Program 212 only allows 1 student.");
+        toast.error("Program 212 only allows 2 student.");
         return;
       }
       
