@@ -139,7 +139,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                     />
                   ))}
                   {/* Input for new student ID */}
-                  {item.categoryName === "General" || item.students.length === 0 ? (
+                  {item.categoryName === "General" || item.name === "ബ്രോഷർ മേക്കിങ്" || item.students.length === 0 ? (
                     <div className="flex flex-wrap items-center">
                       <input
                         type="text"
