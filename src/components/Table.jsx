@@ -147,7 +147,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                     />
                   ))}
                   {/* Input for new student ID */}
-                  {item.categoryName === "General" ||( item.name === "ബ്രോഷർ മേക്കിങ്" && item.students.length !==3) ||( item.name === "കയ്യെഴുത് അറബി" && item.students.length !==2) ||( item.name === "കയ്യെഴുത് ഇംഗ്ലീഷ്" && item.students.length !==2 )  ||( item.name === "സില്ലോജിസം" && item.students.length !==2)   || ( item.name === "ക്വിസ് മത്സരം" && item.students.length !==2)   ||( item.name === "മാത്തമാറ്റിക്കൽ റീസണിങ് & ആപ്റ്റിട്യൂട്" && item.students.length !==2)   ||( item.name === "കൊളാഷ് നിർമാണം" && item.students.length !==3 )|| item.students.length === 0 ? (
+                  {item.categoryName === "General" ||( item.name === "ബ്രോഷർ മേക്കിങ്" && item.students.length !==3) || ( item.name === "കൊളാഷ് നിർമാണം" && item.students.length !==3 )|| item.students.length === 0 ? (
                     <div className="flex flex-wrap items-center">
                       <input
                         type="text"
