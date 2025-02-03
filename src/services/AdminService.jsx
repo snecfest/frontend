@@ -4,7 +4,7 @@ export const fetchAdminData = async (token) => {
     console.log("Token from the service section:", token);
 
     try {
-        const response = await axiosInstance.post(
+        const response = await axiosInstance.get(
             "/programs/programs/summary-detailed",
             {},  
             {
