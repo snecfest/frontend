@@ -24,7 +24,7 @@ const Login = () => {
     console.log("Submitted Data:", token);
     try {
       const response = await LoginService(token);
-      // console.log('response in the login component',response)
+      console.log('response in the login component',response)
       if (response.status === 200) {
         Cookies.set("authToken", response.data.token, { expires: 0.5 });
         toast.success("Login Successful!");
