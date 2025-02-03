@@ -21,7 +21,11 @@ const Navbar = () => {
         className="text-white font-bold text-xl cursor-pointer"
         onClick={() => navigate("/")}
       >
-        SnecFest
+        <img
+          src="https://i.imgur.com/MaTPR7x.png"
+          alt="logo"
+          className="h-12 w-auto object-contain" // Ensures proper scaling
+        />
       </div>
 
       {/* Navigation Links */}

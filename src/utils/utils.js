@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 const baseURL = window.location.hostname === 'snec.vercel.app'
   ? 'https://resgister-theta.vercel.app/api'
-  : 'https://she-backend.vercel.app/api';
+  : 'https://she-backend.vercel.app/c';
 
 export const axiosInstance = axios.create({
   baseURL,
