@@ -24,7 +24,6 @@ const AdminHome = () => {
   
       if (response.status === 200 && response.data) {
         setData(response.data.data);
-        setSubmittedToken(token);
         console.log("Token submitted successfully", response.data);
       } else {
         console.log("Unexpected API Response:", response);
