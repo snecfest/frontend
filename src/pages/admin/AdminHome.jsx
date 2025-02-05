@@ -1,36 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { fetchAdminData } from "../../services/AdminService";
 import Modal from "../../components/Modal";
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const AdminHome = () => {
   const [token, setToken] = useState("");
   const [submittedToken, setSubmittedToken] = useState(null);
-  const [adminData, setAdminData] = useState(null);
+  const [data, setData] = useState(null);
   const [selectedCollege, setSelectedCollege] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [expandedPrograms, setExpandedPrograms] = useState({});
+  const [expandedColleges, setExpandedColleges] = useState({});
 
-  useEffect(() => {
-    if (submittedToken) {
-      fetchAdminData(submittedToken).then((response) => {
-        if (response.status === 200) {
-          setAdminData(response.data);
-        }
-      });
-    }
-  }, [submittedToken]);
-
+  // Fetch Data when Token is Submitted
   const handleSubmit = async () => {
     if (!token.trim()) {
       alert("Please enter a token!");
       return;
     }
-    setSubmittedToken(token);
+    try {
+      const response = await fetchAdminData(token);
+      if (response.status === 200) {
+        setData(response.data);
+        setSubmittedToken(token);
+        console.log("Token submitted successfully", response.data);
+      } else {
+        console.log("Failed to submit token");
+      }
+    } catch (error) {
+      console.error("Error submitting token:", error);
+    }
     setToken("");
+  };
+
+  // Toggle Expand/Collapse Programs
+  const toggleProgram = (programName) => {
+    setExpandedPrograms((prev) => ({
+      ...prev,
+      [programName]: !prev[programName],
+    }));
+  };
+
+  // Toggle Expand/Collapse Colleges
+  const toggleCollege = (collegeId) => {
+    setExpandedColleges((prev) => ({
+      ...prev,
+      [collegeId]: !prev[collegeId],
+    }));
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* Navbar Section */}
       <nav className="bg-gray-900 text-white py-4 px-6 flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold">Admin Dashboard</h1>
         {!submittedToken && (
@@ -52,96 +73,112 @@ const AdminHome = () => {
         )}
       </nav>
 
-      {/* College Data */}
-      {adminData && (
-        <div className="p-6">
-          <h2 className="text-2xl font-bold">Colleges & Programs</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {adminData.colleges.map((college) => (
-              <div key={college._id} className="p-4 bg-white rounded-lg shadow">
-                <h3 className="text-lg font-bold">{college.name}</h3>
-                <button
-                  onClick={() => setSelectedCollege(college)}
-                  className="text-blue-500 mt-2"
-                >
-                  View Details
-                </button>
+      {/* Main Content */}
+      <div className="p-6">
+        {!data ? (
+          <p className="text-lg">Submit a token to load data.</p>
+        ) : (
+          <>
+            {/* College-wise Section */}
+            <h2 className="text-xl font-semibold mt-6 mb-3">Colleges</h2>
+            {data.colleges.map((college) => (
+              <div key={college._id} className="bg-white p-4 rounded-md shadow-md mb-3">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">{college.name}</h3>
+                  <button
+                    onClick={() => toggleCollege(college._id)}
+                    className="px-3 py-1 bg-gray-800 text-white rounded-md"
+                  >
+                    {expandedColleges[college._id] ? "Collapse" : "View Details"}
+                  </button>
+                </div>
+                {expandedColleges[college._id] && (
+                  <div className="mt-2">
+                    <p><strong>Place:</strong> {college.place}</p>
+                    <h4 className="mt-2 font-medium">Programs:</h4>
+                    {college.programs.map((program) => (
+                      <div key={program.uniqueCode} className="ml-4">
+                        <p>{program.name} - {program.category} ({program.studentCount} students)</p>
+                        <button
+                          onClick={() => setSelectedProgram(program)}
+                          className="text-blue-600 hover:underline"
+                        >
+                          View Students
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
-          </div>
-        </div>
-      )}
 
-      {/* Program Data */}
-      {adminData && (
-        <div className="p-6">
-          <h2 className="text-2xl font-bold">Programs Overview</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {adminData.programTotals.map((program) => (
-              <div key={program.name} className="p-4 bg-white rounded-lg shadow">
-                <h3 className="text-lg font-bold">{program.name}</h3>
-                <p>{program.totalStudents} Students</p>
-                <button
-                  onClick={() => setSelectedProgram(program)}
-                  className="text-blue-500 mt-2"
-                >
-                  View Details
-                </button>
+            {/* Program-wise Section */}
+            <h2 className="text-xl font-semibold mt-6 mb-3">Programs</h2>
+            {data.programTotals.map((program) => (
+              <div key={program.name} className="bg-white p-4 rounded-md shadow-md mb-3">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">{program.name} - {program.category}</h3>
+                  <button
+                    onClick={() => toggleProgram(program.name)}
+                    className="px-3 py-1 bg-gray-800 text-white rounded-md"
+                  >
+                    {expandedPrograms[program.name] ? "Collapse" : "View Students"}
+                  </button>
+                </div>
+                {expandedPrograms[program.name] && (
+                  <div className="mt-2">
+                    <h4 className="mt-2 font-medium">Colleges Offering This Program:</h4>
+                    <ul className="list-disc ml-5">
+                      {program.colleges.map((college) => (
+                        <li key={college}>{college}</li>
+                      ))}
+                    </ul>
+                    <h4 className="mt-2 font-medium">Students:</h4>
+                    {program.students.map((student) => (
+                      <p key={student.studentId}>{student.name} ({student.studentId})</p>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
-          </div>
-        </div>
-      )}
+
+            {/* Chart Section */}
+            <h2 className="text-xl font-semibold mt-6 mb-3">Student Distribution</h2>
+            <div className="bg-white p-4 rounded-md shadow-md">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={data.programTotals}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="totalStudents" fill="#3182CE" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* College Modal */}
       {selectedCollege && (
-        <Modal title={selectedCollege.name} onClose={() => setSelectedCollege(null)}>
+        <Modal onClose={() => setSelectedCollege(null)}>
+          <h2 className="text-xl font-semibold">{selectedCollege.name}</h2>
+          <p><strong>Place:</strong> {selectedCollege.place}</p>
+          <h4 className="mt-2 font-medium">Programs:</h4>
           {selectedCollege.programs.map((program) => (
-            <div key={program.uniqueCode} className="mt-4">
-              <h3 className="text-lg font-semibold">{program.name}</h3>
-              <button className="text-blue-500" onClick={() => program.showStudents = !program.showStudents}>
-                Toggle Students
-              </button>
-              {program.showStudents && (
-                <ul className="ml-4 mt-2">
-                  {program.students.map((student) => (
-                    <li key={student.studentId} className="text-gray-700">
-                      {student.studentId} - {student.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <p key={program.uniqueCode}>{program.name} - {program.category}</p>
           ))}
         </Modal>
       )}
 
       {/* Program Modal */}
       {selectedProgram && (
-        <Modal title={selectedProgram.name} onClose={() => setSelectedProgram(null)}>
-          <h3 className="text-lg font-semibold">Total Students: {selectedProgram.totalStudents}</h3>
-          <h4 className="mt-2">Colleges Offering:</h4>
-          <ul>
-            {selectedProgram.colleges.map((college) => (
-              <li key={college} className="text-gray-700">{college}</li>
-            ))}
-          </ul>
+        <Modal onClose={() => setSelectedProgram(null)}>
+          <h2 className="text-xl font-semibold">{selectedProgram.name}</h2>
+          <h4 className="mt-2 font-medium">Students:</h4>
+          {selectedProgram.students.map((student) => (
+            <p key={student.studentId}>{student.name} ({student.studentId})</p>
+          ))}
         </Modal>
-      )}
-
-      {/* Charts */}
-      {adminData && (
-        <div className="p-6">
-          <h2 className="text-2xl font-bold">Student Distribution</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={adminData.programTotals}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="totalStudents" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
       )}
     </div>
   );
