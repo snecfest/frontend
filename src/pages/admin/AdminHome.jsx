@@ -22,7 +22,6 @@ const AdminHome = () => {
       const response = await fetchAdminData(token);
       if (response.status === 200) {
         setData(response.data);
-        setSubmittedToken(token);
         console.log("Token submitted successfully", response.data);
       } else {
         console.log("Failed to submit token");
