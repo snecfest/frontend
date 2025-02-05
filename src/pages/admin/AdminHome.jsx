@@ -14,7 +14,7 @@ const AdminHome = () => {
     if (submittedToken) {
       fetchAdminData(submittedToken).then((response) => {
         if (response.status === 200) {
-          setAdminData(response);
+          setAdminData(response.data);
         }
       });
     }
@@ -57,7 +57,7 @@ const AdminHome = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold">Colleges & Programs</h2>
           <div className="grid grid-cols-2 gap-4">
-            {adminData.data.colleges.map((college) => (
+            {adminData.colleges.map((college) => (
               <div key={college._id} className="p-4 bg-white rounded-lg shadow">
                 <h3 className="text-lg font-bold">{college.name}</h3>
                 <button
@@ -77,7 +77,7 @@ const AdminHome = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold">Programs Overview</h2>
           <div className="grid grid-cols-2 gap-4">
-            {adminData.data.programTotals.map((program) => (
+            {adminData.programTotals.map((program) => (
               <div key={program.name} className="p-4 bg-white rounded-lg shadow">
                 <h3 className="text-lg font-bold">{program.name}</h3>
                 <p>{program.totalStudents} Students</p>
@@ -134,7 +134,7 @@ const AdminHome = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold">Student Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={adminData.data.programTotals}>
+            <BarChart data={adminData.programTotals}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
