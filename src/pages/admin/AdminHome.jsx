@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { fetchAdminData } from "../../services/AdminService";
-import Modal from "../../components/Modal";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const AdminHome = () => {
   const [token, setToken] = useState("");
   const [submittedToken, setSubmittedToken] = useState(null);
   const [data, setData] = useState(null);
-  const [selectedCollege, setSelectedCollege] = useState(null);
-  const [selectedProgram, setSelectedProgram] = useState(null);
-  const [expandedPrograms, setExpandedPrograms] = useState({});
   const [expandedColleges, setExpandedColleges] = useState({});
+  const [expandedPrograms, setExpandedPrograms] = useState({});
 
   // Fetch Data when Token is Submitted
   const handleSubmit = async () => {
@@ -20,8 +17,8 @@ const AdminHome = () => {
     }
     try {
       const response = await fetchAdminData(token);
-      console.log("Full API Response:", response); // Debugging Log
-  
+      console.log("Full API Response:", response);
+      
       if (response.success) {
         setData(response.data);
         console.log("Token submitted successfully", response.data);
@@ -33,21 +30,20 @@ const AdminHome = () => {
     }
     setToken("");
   };
-  
-
-  // Toggle Expand/Collapse Programs
-  const toggleProgram = (programName) => {
-    setExpandedPrograms((prev) => ({
-      ...prev,
-      [programName]: !prev[programName],
-    }));
-  };
 
   // Toggle Expand/Collapse Colleges
   const toggleCollege = (collegeId) => {
     setExpandedColleges((prev) => ({
       ...prev,
       [collegeId]: !prev[collegeId],
+    }));
+  };
+
+  // Toggle Expand/Collapse Programs
+  const toggleProgram = (programName) => {
+    setExpandedPrograms((prev) => ({
+      ...prev,
+      [programName]: !prev[programName],
     }));
   };
 
@@ -75,6 +71,23 @@ const AdminHome = () => {
         )}
       </nav>
 
+      {/* Chart Section at the Top */}
+      {data && (
+        <div className="p-6">
+          <h2 className="text-xl font-semibold mb-3">Student Distribution</h2>
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={data.programTotals}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="totalStudents" fill="#3182CE" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="p-6">
         {!data ? (
@@ -101,12 +114,12 @@ const AdminHome = () => {
                     {college.programs.map((program) => (
                       <div key={program.uniqueCode} className="ml-4">
                         <p>{program.name} - {program.category} ({program.studentCount} students)</p>
-                        <button
-                          onClick={() => setSelectedProgram(program)}
-                          className="text-blue-600 hover:underline"
-                        >
-                          View Students
-                        </button>
+                        <h4 className="font-medium">Students:</h4>
+                        <ul className="list-disc ml-5">
+                          {program.students.map((student) => (
+                            <li key={student.studentId}>{student.name} ({student.studentId})</li>
+                          ))}
+                        </ul>
                       </div>
                     ))}
                   </div>
@@ -143,45 +156,9 @@ const AdminHome = () => {
                 )}
               </div>
             ))}
-
-            {/* Chart Section */}
-            <h2 className="text-xl font-semibold mt-6 mb-3">Student Distribution</h2>
-            <div className="bg-white p-4 rounded-md shadow-md">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data.programTotals}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="totalStudents" fill="#3182CE" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
           </>
         )}
       </div>
-
-      {/* College Modal */}
-      {selectedCollege && (
-        <Modal onClose={() => setSelectedCollege(null)}>
-          <h2 className="text-xl font-semibold">{selectedCollege.name}</h2>
-          <p><strong>Place:</strong> {selectedCollege.place}</p>
-          <h4 className="mt-2 font-medium">Programs:</h4>
-          {selectedCollege.programs.map((program) => (
-            <p key={program.uniqueCode}>{program.name} - {program.category}</p>
-          ))}
-        </Modal>
-      )}
-
-      {/* Program Modal */}
-      {selectedProgram && (
-        <Modal onClose={() => setSelectedProgram(null)}>
-          <h2 className="text-xl font-semibold">{selectedProgram.name}</h2>
-          <h4 className="mt-2 font-medium">Students:</h4>
-          {selectedProgram.students.map((student) => (
-            <p key={student.studentId}>{student.name} ({student.studentId})</p>
-          ))}
-        </Modal>
-      )}
     </div>
   );
 };
