@@ -127,35 +127,39 @@ const AdminHome = () => {
               </div>
             ))}
 
-            {/* Program-wise Section */}
-            <h2 className="text-xl font-semibold mt-6 mb-3">Programs</h2>
-            {data.programTotals.map((program) => (
-              <div key={program.name} className="bg-white p-4 rounded-md shadow-md mb-3">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">{program.name} - {program.category}</h3>
-                  <button
-                    onClick={() => toggleProgram(program.name)}
-                    className="px-3 py-1 bg-gray-800 text-white rounded-md"
-                  >
-                    {expandedPrograms[program.name] ? "Collapse" : "View Students"}
-                  </button>
-                </div>
-                {expandedPrograms[program.name] && (
-                  <div className="mt-2">
-                    <h4 className="mt-2 font-medium">Colleges Offering This Program:</h4>
-                    <ul className="list-disc ml-5">
-                      {program.colleges.map((college) => (
-                        <li key={college}>{college}</li>
-                      ))}
-                    </ul>
-                    <h4 className="mt-2 font-medium">Students:</h4>
-                    {program.students.map((student) => (
-                      <p key={student.studentId}>{student.name} ({student.studentId})</p>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+           {/* Program-wise Section */}
+<h2 className="text-xl font-semibold mt-6 mb-3">Programs</h2>
+{data.programTotals.map((program) => (
+  <div key={program.name} className="bg-white p-4 rounded-md shadow-md mb-3">
+    <div className="flex justify-between items-center">
+      <h3 className="text-lg font-medium">{program.name} - {program.category}</h3>
+      <button
+        onClick={() => toggleProgram(program.name)}
+        className="px-3 py-1 bg-gray-800 text-white rounded-md"
+      >
+        {expandedPrograms[program.name] ? "Collapse" : "View Students"}
+      </button>
+    </div>
+    {expandedPrograms[program.name] && (
+      <div className="mt-2">
+        {/* Display the number of colleges participating */}
+        <p><strong>Colleges Participating:</strong> {program.colleges.length}</p> {/* New info */}
+        
+        <h4 className="mt-2 font-medium">Colleges Offering This Program:</h4>
+        <ul className="list-disc ml-5">
+          {program.colleges.map((college) => (
+            <li key={college}>{college}</li>
+          ))}
+        </ul>
+        <h4 className="mt-2 font-medium">Students:</h4>
+        {program.students.map((student) => (
+          <p key={student.studentId}>{student.name} ({student.studentId})</p>
+        ))}
+      </div>
+    )}
+  </div>
+))}
+
           </>
         )}
       </div>
