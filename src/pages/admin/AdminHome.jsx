@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { fetchAdminData } from "../../services/AdminService";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { Modal } from "@/components/ui/modal";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const AdminHome = () => {
   const [token, setToken] = useState("");
   const [submittedToken, setSubmittedToken] = useState(null);
-  const [data, setData] = useState(null);
+  const [adminData, setAdminData] = useState(null);
+  const [selectedCollege, setSelectedCollege] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+
+  useEffect(() => {
+    if (submittedToken) {
+      fetchAdminData(submittedToken).then((response) => {
+        if (response.status === 200) {
+          setAdminData(response.data);
+        }
+      });
+    }
+  }, [submittedToken]);
 
   const handleSubmit = async () => {
     if (!token.trim()) {
       alert("Please enter a token!");
       return;
     }
-
-    try {
-      const response = await fetchAdminData(token);
-      if (response.success) {
-        setSubmittedToken(token);
-        setData(response.data);
-        console.log("Token submitted successfully");
-      } else {
-        console.log("Failed to submit token");
-      }
-    } catch (error) {
-      console.error("Error submitting token:", error);
-    }
-
-    setToken(""); // Clear input after submission
+    setSubmittedToken(token);
+    setToken("");
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar Section */}
       <nav className="bg-gray-900 text-white py-4 px-6 flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold">Admin Dashboard</h1>
         {!submittedToken && (
@@ -53,47 +52,97 @@ const AdminHome = () => {
         )}
       </nav>
 
-      {/* Main Content */}
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Admin Home</h2>
-
-        {data ? (
-          <div>
-            {/* Program-wise Data */}
-            <h3 className="text-xl font-semibold mt-6">Programs and Student Count</h3>
-            <div className="bg-white p-4 rounded shadow-md">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data.programTotals}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="totalStudents" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* College-wise Data */}
-            <h3 className="text-xl font-semibold mt-6">Colleges and Programs</h3>
-            <div className="bg-white p-4 rounded shadow-md">
-              {data.colleges.map((college, index) => (
-                <div key={index} className="mb-4">
-                  <h4 className="text-lg font-bold">{college.name}</h4>
-                  <ul className="list-disc pl-5">
-                    {college.programs.map((program, idx) => (
-                      <li key={idx}>
-                        {program.name} ({program.studentCount} students)
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
+      {/* College Data */}
+      {adminData && (
+        <div className="p-6">
+          <h2 className="text-2xl font-bold">Colleges & Programs</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {adminData.data.colleges.map((college) => (
+              <div key={college._id} className="p-4 bg-white rounded-lg shadow">
+                <h3 className="text-lg font-bold">{college.name}</h3>
+                <button
+                  onClick={() => setSelectedCollege(college)}
+                  className="text-blue-500 mt-2"
+                >
+                  View Details
+                </button>
+              </div>
+            ))}
           </div>
-        ) : (
-          <p className="text-lg">Enter a token to view data.</p>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Program Data */}
+      {adminData && (
+        <div className="p-6">
+          <h2 className="text-2xl font-bold">Programs Overview</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {adminData.data.programTotals.map((program) => (
+              <div key={program.name} className="p-4 bg-white rounded-lg shadow">
+                <h3 className="text-lg font-bold">{program.name}</h3>
+                <p>{program.totalStudents} Students</p>
+                <button
+                  onClick={() => setSelectedProgram(program)}
+                  className="text-blue-500 mt-2"
+                >
+                  View Details
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* College Modal */}
+      {selectedCollege && (
+        <Modal title={selectedCollege.name} onClose={() => setSelectedCollege(null)}>
+          {selectedCollege.programs.map((program) => (
+            <div key={program.uniqueCode} className="mt-4">
+              <h3 className="text-lg font-semibold">{program.name}</h3>
+              <button className="text-blue-500" onClick={() => program.showStudents = !program.showStudents}>
+                Toggle Students
+              </button>
+              {program.showStudents && (
+                <ul className="ml-4 mt-2">
+                  {program.students.map((student) => (
+                    <li key={student.studentId} className="text-gray-700">
+                      {student.studentId} - {student.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </Modal>
+      )}
+
+      {/* Program Modal */}
+      {selectedProgram && (
+        <Modal title={selectedProgram.name} onClose={() => setSelectedProgram(null)}>
+          <h3 className="text-lg font-semibold">Total Students: {selectedProgram.totalStudents}</h3>
+          <h4 className="mt-2">Colleges Offering:</h4>
+          <ul>
+            {selectedProgram.colleges.map((college) => (
+              <li key={college} className="text-gray-700">{college}</li>
+            ))}
+          </ul>
+        </Modal>
+      )}
+
+      {/* Charts */}
+      {adminData && (
+        <div className="p-6">
+          <h2 className="text-2xl font-bold">Student Distribution</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={adminData.data.programTotals}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="totalStudents" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 };
