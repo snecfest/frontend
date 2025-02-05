@@ -5,8 +5,7 @@ export const fetchAdminData = async (token) => {
 
     try {
         const response = await axiosInstance.get(
-            "/programs/programs/summary-detailed",
-            {},  
+            "/programs/programs/summary-detailed", 
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
