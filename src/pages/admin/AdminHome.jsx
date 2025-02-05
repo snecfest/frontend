@@ -14,7 +14,7 @@ const AdminHome = () => {
     if (submittedToken) {
       fetchAdminData(submittedToken).then((response) => {
         if (response.status === 200) {
-          setAdminData(response.data);
+          setAdminData(response);
         }
       });
     }
