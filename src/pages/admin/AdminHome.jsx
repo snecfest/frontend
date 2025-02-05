@@ -20,17 +20,21 @@ const AdminHome = () => {
     }
     try {
       const response = await fetchAdminData(token);
-      if (response.status === 200) {
+      console.log("Full API Response:", response); // Debugging Log
+  
+      if (response.status === 200 && response.data) {
         setData(response.data);
+        setSubmittedToken(token);
         console.log("Token submitted successfully", response.data);
       } else {
-        console.log("Failed to submit token");
+        console.log("Unexpected API Response:", response);
       }
     } catch (error) {
       console.error("Error submitting token:", error);
     }
     setToken("");
   };
+  
 
   // Toggle Expand/Collapse Programs
   const toggleProgram = (programName) => {
