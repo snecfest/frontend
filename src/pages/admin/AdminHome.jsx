@@ -23,7 +23,7 @@ const AdminHome = () => {
       console.log("Full API Response:", response); // Debugging Log
   
       if (response.status === 200 && response.data) {
-        setData(response.data);
+        setData(response.data.data);
         setSubmittedToken(token);
         console.log("Token submitted successfully", response.data);
       } else {
