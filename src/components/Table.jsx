@@ -187,7 +187,17 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
               </td>
               <td className="border border-gray-300 px-4 py-2 text-center">
                 <button
-                  onClick={() => onDelete(item)}
+                  onClick={() => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const isAdmin = urlParams.get('isAdmin') === 'true';
+                  
+                    if (window.location.hostname === 'snec.vercel.app' && !isAdmin) {
+                      alert('Editing is temporarily stopped. Contact the admin.');
+                    } else {
+                      onDelete(item);
+                    }
+                  }}
+                  
                   className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
                 >
                   Delete
