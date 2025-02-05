@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { fetchAdminData } from "../../services/AdminService";
-import { Modal } from "@/components/ui/modal";
+import Modal from "../../components/Modal";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const AdminHome = () => {
