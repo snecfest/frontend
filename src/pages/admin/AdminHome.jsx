@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { fetchAdminData } from "../../services/AdminService";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const AdminHome = () => {
   const [token, setToken] = useState("");
   const [data, setData] = useState(null);
-  const [selectedProgram, setSelectedProgram] = useState(null);
-
+  const [expandedColleges, setExpandedColleges] = useState({});
+  const [expandedPrograms, setExpandedPrograms] = useState({});
+  
   const handleSubmit = async () => {
     if (!token.trim()) {
       alert("Please enter a token!");
@@ -24,6 +25,14 @@ const AdminHome = () => {
     }
     setToken("");
   };
+  
+  const toggleCollege = (collegeId) => {
+    setExpandedColleges((prev) => ({ ...prev, [collegeId]: !prev[collegeId] }));
+  };
+  
+  const toggleProgram = (programName) => {
+    setExpandedPrograms((prev) => ({ ...prev, [programName]: !prev[programName] }));
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -37,77 +46,64 @@ const AdminHome = () => {
             onChange={(e) => setToken(e.target.value)}
             className="px-4 py-2 rounded-md text-black border border-gray-300"
           />
-          <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Submit
-          </button>
+          <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded-md">Submit</button>
         </div>
       </nav>
 
       {data && (
         <>
-          {/* Diagrams Section */}
-          <div className="bg-white p-4 rounded-md shadow-md mt-4">
-            <h2 className="text-xl font-semibold mb-3">Student Distribution</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.programTotals}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="totalStudents" fill="#3182CE" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Table View for Colleges and Programs */}
-          <h2 className="text-xl font-semibold mt-6">Colleges and Programs</h2>
-          <table className="w-full bg-white shadow-md rounded-md mt-4">
-            <thead>
-              <tr className="bg-gray-800 text-white">
-                <th className="py-2 px-4">College</th>
-                <th className="py-2 px-4">Location</th>
-                <th className="py-2 px-4">Programs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.colleges.map((college) => (
-                <tr key={college._id} className="border-b">
-                  <td className="py-2 px-4 font-medium">{college.name}</td>
-                  <td className="py-2 px-4">{college.place}</td>
-                  <td className="py-2 px-4">
-                    {college.programs.map((program) => (
-                      <button
-                        key={program.uniqueCode}
-                        onClick={() => setSelectedProgram(program)}
-                        className="text-blue-600 hover:underline mr-2"
-                      >
-                        {program.name}
-                      </button>
+          <div className="grid grid-cols-2 gap-6 mt-6">
+            <div className="bg-white p-4 rounded-md shadow-md">
+              <h2 className="text-lg font-semibold">Student Distribution</h2>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={data.programTotals}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="totalStudents" fill="#3182CE" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-white p-4 rounded-md shadow-md">
+              <h2 className="text-lg font-semibold">Participation Percentage</h2>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie data={data.programTotals} dataKey="percentage" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
+                    {data.programTotals.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#FFBB28" : "#0088FE"} />
                     ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-
-      {/* Custom Modal */}
-      {selectedProgram && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-md shadow-md w-1/3">
-            <h2 className="text-xl font-semibold">{selectedProgram.name}</h2>
-            <h4 className="mt-2 font-medium">Students:</h4>
-            {selectedProgram.students.map((student) => (
-              <p key={student.studentId}>{student.name} ({student.studentId})</p>
-            ))}
-            <button
-              onClick={() => setSelectedProgram(null)}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md"
-            >
-              Close
-            </button>
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-        </div>
+          <div className="flex gap-4 mt-6">
+            <button className="bg-green-500 px-4 py-2 rounded-md text-white">View Reports</button>
+            <button className="bg-purple-500 px-4 py-2 rounded-md text-white">Export Data</button>
+            <button className="bg-red-500 px-4 py-2 rounded-md text-white">Manage Users</button>
+          </div>
+          <h2 className="text-xl font-semibold mt-6">Colleges</h2>
+          {data.colleges.map((college) => (
+            <div key={college._id} className="bg-white p-4 rounded-md shadow-md mb-3">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium">{college.name}</h3>
+                <button onClick={() => toggleCollege(college._id)} className="px-3 py-1 bg-gray-800 text-white rounded-md">
+                  {expandedColleges[college._id] ? "Collapse" : "View Details"}
+                </button>
+              </div>
+              {expandedColleges[college._id] && (
+                <div className="mt-2">
+                  <p><strong>Place:</strong> {college.place}</p>
+                  <h4 className="mt-2 font-medium">Programs:</h4>
+                  {college.programs.map((program) => (
+                    <p key={program.uniqueCode}>{program.name} - {program.category} ({program.studentCount} students)</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </>
       )}
     </div>
   );
