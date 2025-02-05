@@ -22,8 +22,8 @@ const AdminHome = () => {
       const response = await fetchAdminData(token);
       console.log("Full API Response:", response); // Debugging Log
   
-      if (response.status === 200 && response.data) {
-        setData(response.data.data);
+      if (response.success) {
+        setData(response.data);
         console.log("Token submitted successfully", response.data);
       } else {
         console.log("Unexpected API Response:", response);
