@@ -189,7 +189,7 @@ const Table = ({ data, onDelete, refetchPrograms }) => {
                 <button
                   onClick={() => {
                     const urlParams = new URLSearchParams(window.location.search);
-                    const isAdmin = urlParams.get('isAdmin') === 'for-irfan';
+                    const isAdmin = urlParams.get('isAdmin') === 'for-irfan-only';
                   
                     if (window.location.hostname === 'snec.vercel.app' && !isAdmin) {
                       alert('Editing is temporarily stopped. Contact the admin.');
